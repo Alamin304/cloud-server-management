@@ -48,6 +48,32 @@ class ServerController extends Controller
         return $query->paginate($perPage);
     }
 
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make(
+    //         $request->all(),
+    //         Server::validationRules(),
+    //         Server::validationMessages()
+    //     );
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Validation failed',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //     try {
+    //         $server = Server::create($request->all());
+    //         return response()->json($server, 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'message' => 'Server creation failed',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function store(Request $request)
     {
         $validator = Validator::make(
@@ -64,7 +90,9 @@ class ServerController extends Controller
         }
 
         try {
-            $server = Server::create($request->all());
+            $data = $request->all();
+            $data['version'] = 0;
+            $server = Server::create($data);
             return response()->json($server, 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -86,36 +114,46 @@ class ServerController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $server = Server::find($id);
+{
+    $server = Server::find($id);
 
-        if (!$server) {
-            return response()->json(['message' => 'Server not found'], 404);
-        }
-
-        $validator = Validator::make(
-            $request->all(),
-            Server::validationRules($id),
-            Server::validationMessages()
-        );
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        try {
-            $server->update($request->all());
-            return response()->json($server);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Server update failed',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    if (!$server) {
+        return response()->json(['message' => 'Server not found'], 404);
     }
+
+    // Check version to prevent race conditions
+    if ($server->version != $request->version) {
+        return response()->json([
+            'message' => 'Server has been modified by another user. Please refresh and try again.'
+        ], 409);
+    }
+
+    $validator = Validator::make(
+        $request->all(),
+        Server::validationRules($id),
+        Server::validationMessages()
+    );
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Validation failed',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    try {
+        $data = $request->all();
+        $data['version'] = $server->version + 1;
+        $server->update($data);
+
+        return response()->json($server);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Server update failed',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     public function destroy($id)
     {
@@ -160,4 +198,5 @@ class ServerController extends Controller
             ], 500);
         }
     }
+
 }

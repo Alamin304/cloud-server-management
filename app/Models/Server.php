@@ -16,7 +16,8 @@ class Server extends Model
         'status',
         'cpu_cores',
         'ram_mb',
-        'storage_gb'
+        'storage_gb',
+        'version',
     ];
 
     protected $casts = [
@@ -27,7 +28,7 @@ class Server extends Model
 
     public static function validationRules($id = null)
     {
-        return [
+        $rules = [
             'name' => 'required|string|max:255|unique:servers,name,' . $id . ',id,provider,' . request('provider'),
             'ip_address' => 'required|ipv4|unique:servers,ip_address,' . $id,
             'provider' => 'required|in:aws,digitalocean,vultr,other',
@@ -36,6 +37,13 @@ class Server extends Model
             'ram_mb' => 'required|integer|between:512,1048576',
             'storage_gb' => 'required|integer|between:10,1048576',
         ];
+
+        // Version is only required for updates
+        if ($id) {
+            $rules['version'] = 'required|integer';
+        }
+
+        return $rules;
     }
 
     public static function validationMessages()
