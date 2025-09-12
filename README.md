@@ -13,7 +13,7 @@ A full-stack web application for managing cloud servers built with Laravel, MySQ
 
 ## Tech Stack
 
-- **Backend**: Laravel 9.x
+- **Backend**: Laravel 12.x
 - **Frontend**: Blade templating with Bootstrap 5
 - **Database**: MySQL
 - **Authentication**: Laravel Sanctum for API, Laravel UI for web
