@@ -84,7 +84,7 @@ POST /api/servers/bulk-delete - Bulk delete servers
 
 
 Example API Usage
-bash
+
 # Get all servers
 curl -H "Authorization: Bearer {token}" http://localhost:8000/api/servers
 
