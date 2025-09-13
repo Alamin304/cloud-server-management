@@ -18,6 +18,8 @@ A full-stack web application for managing cloud servers built with Laravel, MySQ
 - **Database**: MySQL
 - **Authentication**: Laravel Sanctum for API, Laravel UI for web
 
+---
+
 ## Installation
 
 1. Clone the repository:
@@ -25,94 +27,109 @@ A full-stack web application for managing cloud servers built with Laravel, MySQ
    git clone <repository-url>
    cd cloud-server-management
 
+2. **Install dependencies**
 
-Install dependencies:
-bash
+```bash
 composer install
 npm install
+npm run dev
+```
 
-Create environment file:
-bash
+3. **Copy `.env` file**
+
+```bash
 cp .env.example .env
+```
 
-Generate application key:
-bash
+4. **Generate application key**
+
+```bash
 php artisan key:generate
+```
 
-Configure database in .env:
-env
-DB_DATABASE=your_database_name
+5. **Configure database** in `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
+```
 
-Run migrations and seeders:
-bash
-php artisan migrate
-php artisan db:seed
+6. **Run migrations and seeders**
 
-Install and build frontend assets:
-bash
-npm run dev
+```bash
+php artisan migrate --seed
+```
 
-Start the development server:
-bash
+7. **Serve the application**
+
+```bash
 php artisan serve
-Visit http://localhost:8000 in your browser.
+```
 
-API Documentation
-Authentication
-The API uses Laravel Sanctum for authentication. To authenticate:
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
-Register a user via the web interface or API
+---
 
-Get an API token by logging in via /login endpoint
+## Configuration
 
-Include the token in the Authorization header as Bearer {token}
+* **Mail Setup** (Optional for notifications):
 
-Endpoints
-GET /api/servers - List all servers (with pagination, filtering, and sorting)
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@example.com
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your_email@example.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
 
-POST /api/servers - Create a new server
+* **API Tokens**: Use **Laravel Sanctum** for API authentication. Generate tokens for users to access endpoints.
 
-GET /api/servers/{id} - Get a specific server
+---
 
-PUT /api/servers/{id} - Update a server
+## Usage
 
-DELETE /api/servers/{id} - Delete a server
+1. **Dashboard**: View all servers, filter by provider, name, or status.
+2. **Add Server**: Fill in server details, including name, IP, provider, and resources.
+3. **Edit Server**: Update server details with validation.
+4. **Delete Server**: Remove servers individually or in bulk.
+5. **API**: Access all CRUD operations programmatically using your API token.
 
-POST /api/servers/bulk-delete - Bulk delete servers
+---
 
+## API Endpoints
 
-Example API Usage
+| Method | Endpoint            | Description         |
+| ------ | ------------------- | ------------------- |
+| GET    | `/api/servers`      | List all servers    |
+| POST   | `/api/servers`      | Create a new server |
+| GET    | `/api/servers/{id}` | Get server details  |
+| PUT    | `/api/servers/{id}` | Update server       |
+| DELETE | `/api/servers/{id}` | Delete server       |
 
-# Get all servers
-curl -H "Authorization: Bearer {token}" http://localhost:8000/api/servers
+> Requires **Sanctum token** for authentication.
 
-# Create a new server
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer {token}" \
-  -d '{
-    "name": "api-server",
-    "ip_address": "192.168.1.200",
-    "provider": "aws",
-    "status": "active",
-    "cpu_cores": 4,
-    "ram_mb": 8192,
-    "storage_gb": 100
-  }' \
-  http://localhost:8000/api/servers
+---
 
-# Update a server
-curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer {token}" \
-  -d '{
-    "name": "updated-api-server",
-    "ip_address": "192.168.1.200",
-    "provider": "aws",
-    "status": "active",
-    "cpu_cores": 8,
-    "ram_mb": 16384,
-    "storage_gb": 200
-  }' \
-  http://localhost:8000/api/servers/1
+## Testing
 
-# Delete a server
-curl -X DELETE -H "Authorization: Bearer {token}" http://localhost:8000/api/servers/1
+Run tests using PHPUnit:
+
+```bash
+php artisan test
+```
+
+Test coverage includes:
+
+* Server CRUD operations
+* Form validation
+* API endpoint functionality
+
+---
+
